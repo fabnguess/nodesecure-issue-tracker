@@ -1,10 +1,6 @@
 <p align="center"><h1 align="center">
-  ossf-scorecard-sdk
+  nodesecure-issue-tracker
 </h1>
-
-<p align="center">
-  Node.js SDK for <a href="https://github.com/ossf/scorecard">OpenSSF scorecard</a>
-</p>
 
 <p align="center">
     <a href="https://github.com/fabnguess/nodesecure-issue-tracker">
