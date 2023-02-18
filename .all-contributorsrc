@@ -4,10 +4,21 @@
   ],
   "imageSize": 100,
   "commit": false,
-  "contributors": [],
+  "contributors": [
+    {
+      "login": "fabnguess",
+      "name": "Kouadio Fabrice Nguessan",
+      "avatar_url": "https://avatars.githubusercontent.com/u/72697416?v=4",
+      "profile": "https://github.com/fabnguess",
+      "contributions": [
+        "code",
+        "doc"
+      ]
+    }
+  ],
   "contributorsPerLine": 7,
-  "projectName": "ossf-scorecard-sdk",
-  "projectOwner": "NodeSecure",
+  "projectName": "nodesecure-issue-tracker",
+  "projectOwner": "fabnguess",
   "repoType": "github",
   "repoHost": "https://github.com",
   "skipCi": true

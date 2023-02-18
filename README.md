@@ -15,7 +15,7 @@
     <a href="https://api.securityscorecards.dev/projects/github.com/fabnguess/nodesecure-issue-tracker">
       <img src="https://api.securityscorecards.dev/projects/github.com/fabnguess/nodesecure-issue-tracker/badge?style=for-the-badge" alt="ossf scorecard">
     </a>
-    <a href="https://github.com/NodeSecure/vulnera/actions?query=workflow%3A%22Node.js+CI%22">
+    <a href="https://github.com/fabnguess/nodesecure-issue-tracker/actions?query=workflow%3A%22Node.js+CI%22">
       <img src="https://img.shields.io/github/actions/workflow/status/fabnguess/nodesecure-issue-tracker/main.yml?style=for-the-badge" alt="github ci workflow">
     </a>
 </p>
