@@ -12,18 +12,17 @@ export type Issue = {
   title: string;
   created_at: string;
   body: string;
-  assignee: Assignee;
-};
-
-export type Assignee = {
-  login: string;
-  avatar_url: string;
+  assignee: {
+    login: string;
+    avatar_url: string;
+  };
 };
 
 export type ReposWithIssuesResult = {
   name: string,
   has_issues: boolean,
   issues: Issue[];
+  issues_length: number;
 }
 
 export async function getReposWithIssues() {
@@ -40,22 +39,26 @@ export async function getReposWithIssues() {
     const response = await fetch(`https://api.github.com/repos/NodeSecure/${repo}/issues?labels=${KLabelName}&state=open`,
       { headers });
     const issues = await response.json() as Issue[];
-    const issuesList: Issue[] = [];
-    if (issues.length > 0) {
-      for (const issue of issues) {
-        const data = {
-          title: issue.title,
-          created_at: issue.created_at,
-          body: issue.body,
-          assignee: issue.assignee
-        };
-        issuesList.push(data);
-      }
+
+    if (issues.length === 0) {
+      continue;
     }
+
+    const issuesList = issues.map((issue) => {
+      return {
+        title: issue.title,
+        created_at: issue.created_at,
+        body: issue.body,
+        assignee: issue.assignee
+
+      };
+    });
+
     results.push({
       name: repo,
       has_issues: true,
-      issues: issuesList
+      issues: issuesList,
+      issues_length: issuesList.length
     });
   }
   await fs.writeFile("issuesList.json", JSON.stringify(results));
