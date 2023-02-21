@@ -2,6 +2,8 @@
 import * as dotenv from "dotenv";
 dotenv.config();
 
+import * as fs from "node:fs/promises";
+
 const KRepositoryUrl = "https://api.github.com/orgs/NodeSecure/repos";
 const headers = { Authorization: `Bearer ${process.env.ACCESS_TOKEN}` };
 const KLabelName = "good%20first%20issue";
@@ -56,6 +58,6 @@ export async function getReposWithIssues() {
       issues: issuesList
     });
   }
-  console.log(JSON.stringify(results));
+  await fs.writeFile("issuesList.json", JSON.stringify(results));
 }
 
