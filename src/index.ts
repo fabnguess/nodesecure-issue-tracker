@@ -3,10 +3,10 @@ import * as dotenv from "dotenv";
 dotenv.config();
 
 import * as fs from "node:fs/promises";
+import { URL } from "node:url";
 
-const KRepositoryUrl = "https://api.github.com/orgs/NodeSecure/repos";
+const KGithubApiUrl = "https://api.github.com";
 const headers = { Authorization: `Bearer ${process.env.ACCESS_TOKEN}` };
-const KLabelName = "good%20first%20issue";
 
 export type Issue = {
   title: string;
@@ -25,20 +25,12 @@ export type ReposWithIssuesResult = {
   issues_length: number;
 }
 
-export async function getReposWithIssues() {
-  const response = await fetch(KRepositoryUrl, { headers });
-  if (!response.ok) {
-    throw new Error(response.statusText);
-  }
-  const repositories = await response.json() as ReposWithIssuesResult[];
-  const reposWithActiveIssueFunctionality = repositories.filter((repository) => repository.has_issues)
-    .map((repository) => repository.name);
+export async function getReposWithIssues(Organization: string, labelName: string) {
+  const reposWithActiveIssueFunctionality = await fetchRepositoriesWithActiveIssues(Organization);
 
   const results: ReposWithIssuesResult[] = [];
   for (const repo of reposWithActiveIssueFunctionality) {
-    const response = await fetch(`https://api.github.com/repos/NodeSecure/${repo}/issues?labels=${KLabelName}&state=open`,
-      { headers });
-    const issues = await response.json() as Issue[];
+    const issues = await fetchIssuesForRepositories(Organization, repo, labelName);
 
     if (issues.length === 0) {
       continue;
@@ -64,3 +56,24 @@ export async function getReposWithIssues() {
   await fs.writeFile("issuesList.json", JSON.stringify(results));
 }
 
+export async function fetchRepositoriesWithActiveIssues(Organization: string) {
+  const { href } = new URL(`orgs/${Organization}/repos`, KGithubApiUrl);
+
+  const response = await fetch(href, { headers });
+  if (!response.ok) {
+    throw new Error(response.statusText);
+  }
+  const repositories = await response.json() as ReposWithIssuesResult[];
+
+  return repositories.filter((repository) => repository.has_issues)
+    .map((repository) => repository.name);
+}
+
+export async function fetchIssuesForRepositories(orgaName: string, repoName: string, labelName: string) {
+  const { href } = new URL(`repos/${orgaName}/${repoName}/issues?labels=${encodeURIComponent(labelName)}&state=open`,
+    KGithubApiUrl);
+  const response = await fetch(href, { headers });
+  const issues = await response.json() as Issue[];
+
+  return issues;
+}
