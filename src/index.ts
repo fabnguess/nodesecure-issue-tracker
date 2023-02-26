@@ -25,12 +25,31 @@ export type ReposWithIssuesResult = {
   issues_length: number;
 }
 
-export async function getReposWithIssues(Organization: string, labelName: string) {
-  const reposWithActiveIssueFunctionality = await fetchRepositoriesWithActiveIssues(Organization);
+export interface INodeSecureIssueTracker {
+  /**
+   * @description Represents the name of the organization. It is not case sensitive.
+   * @requires
+   */
+  orgaName: string;
+  /**
+   * @description Represent the name of the repository. It is not case sensitive.
+   * @requires
+   */
+  repoName: string;
+
+  /**
+   * @description
+   */
+  labelName: string
+}
+
+export async function getReposWithIssues(orgaName: string, labelName: string) {
+  const reposWithActiveIssueFunctionality = await fetchRepositoriesWithActiveIssues(orgaName);
 
   const results: ReposWithIssuesResult[] = [];
   for (const repo of reposWithActiveIssueFunctionality) {
-    const issues = await fetchIssuesForRepositories(Organization, repo, labelName);
+    const payload = { orgaName, repoName: repo, labelName };
+    const issues = await fetchIssuesForRepositories(payload);
 
     if (issues.length === 0) {
       continue;
@@ -56,8 +75,15 @@ export async function getReposWithIssues(Organization: string, labelName: string
   await fs.writeFile("issuesList.json", JSON.stringify(results));
 }
 
-export async function fetchRepositoriesWithActiveIssues(Organization: string) {
-  const { href } = new URL(`orgs/${Organization}/repos`, KGithubApiUrl);
+export async function fetchRepositoriesWithActiveIssues(organization: string) {
+  if (typeof organization != "string") {
+    throw new Error(`The organization must be a string but has ${organization}`);
+  }
+
+  if (organization.length < 1) {
+    throw new Error("The organization should not be an empty string");
+  }
+  const { href } = new URL(`orgs/${organization}/repos`, KGithubApiUrl);
 
   const response = await fetch(href, { headers });
   if (!response.ok) {
@@ -69,7 +95,8 @@ export async function fetchRepositoriesWithActiveIssues(Organization: string) {
     .map((repository) => repository.name);
 }
 
-export async function fetchIssuesForRepositories(orgaName: string, repoName: string, labelName: string) {
+export async function fetchIssuesForRepositories(payload: INodeSecureIssueTracker) {
+  const { orgaName, repoName, labelName } = payload;
   const { href } = new URL(`repos/${orgaName}/${repoName}/issues?labels=${encodeURIComponent(labelName)}&state=open`,
     KGithubApiUrl);
   const response = await fetch(href, { headers });
